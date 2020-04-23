@@ -44,7 +44,9 @@ public class DatabaseConfiguration extends AbstractR2dbcConfiguration {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        Matcher m = URL_PATTERN.matcher(dbUrl);
+        int index = dbUrl.indexOf('?');
+        String url = index == -1 ? dbUrl : dbUrl.substring(0, index);
+        Matcher m = URL_PATTERN.matcher(url);
         if (!m.find())
             throw new RuntimeException("Database URL configuration is invalid.");
 
