@@ -1,7 +1,6 @@
 package com.mateusfma.assemblyvoting.controller;
 
 import com.mateusfma.assemblyvoting.controller.rest.enums.VoteValue;
-import com.mateusfma.assemblyvoting.controller.rest.request.CountVoteRequest;
 import com.mateusfma.assemblyvoting.controller.rest.request.VoteRequest;
 import com.mateusfma.assemblyvoting.controller.rest.response.CountVoteResponse;
 import com.mateusfma.assemblyvoting.controller.rest.response.VoteResponse;
@@ -16,6 +15,7 @@ import com.mateusfma.assemblyvoting.service.CPFValidationService;
 import com.mateusfma.assemblyvoting.service.TopicService;
 import com.mateusfma.assemblyvoting.service.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -41,8 +41,8 @@ public class VoteController {
     @PostMapping(value = "/receive")
     public ResponseEntity<Mono<VoteResponse>> receiveVote(@RequestBody VoteRequest request) {
         Mono<VoteResponse> response = Mono.zip(
-                associateService.retrieveAssociate(request.getAssociateId()),
-                topicService.findByName(Mono.just(request.getTopicName())))
+                    associateService.retrieveAssociate(request.getAssociateId()),
+                    topicService.findByName(Mono.just(request.getTopicName())))
                 .flatMap(tuple -> {
                     Associate associate = tuple.getT1();
                     Topic topic = tuple.getT2();
@@ -92,11 +92,13 @@ public class VoteController {
                     return voteResponse;
                 });
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
-    @GetMapping(value = "/count")
-    public ResponseEntity<Mono<CountVoteResponse>> countVotes(@RequestBody CountVoteRequest request) {
-        return ResponseEntity.ok(voteService.countVotes(Mono.just(request)));
+    @GetMapping(value = "/count/{topicId}")
+    public ResponseEntity<Mono<CountVoteResponse>> countVotes(@PathVariable Long topicId) {
+        return ResponseEntity.ok(voteService.countVotes(topicId));
     }
 }

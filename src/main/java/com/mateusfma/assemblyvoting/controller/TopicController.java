@@ -6,6 +6,7 @@ import com.mateusfma.assemblyvoting.controller.rest.response.TopicResponse;
 import com.mateusfma.assemblyvoting.exceptions.IllegalTopicStateException;
 import com.mateusfma.assemblyvoting.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,9 @@ public class TopicController {
 
     @PostMapping(value = "/create")
     public ResponseEntity<Mono<TopicResponse>> createTopic(@RequestBody CreateTopicRequest request) {
-        return ResponseEntity.ok(service.createTopic(Mono.just(request)));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.createTopic(Mono.just(request)));
     }
 
     @PostMapping(value = "/open")

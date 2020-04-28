@@ -5,6 +5,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 @Table("topic")
 public class Topic {
@@ -63,5 +64,22 @@ public class Topic {
 
     public void setOpen(Boolean open) {
         this.open = open;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Topic topic = (Topic) o;
+        return id.equals(topic.id) &&
+                name.equals(topic.name) &&
+                open.equals(topic.open) &&
+                Objects.equals(start, topic.start) &&
+                Objects.equals(durationSec, topic.durationSec);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, open, start, durationSec);
     }
 }

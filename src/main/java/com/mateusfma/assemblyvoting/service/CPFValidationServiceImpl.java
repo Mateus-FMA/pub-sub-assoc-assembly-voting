@@ -13,6 +13,7 @@ public class CPFValidationServiceImpl implements CPFValidationService {
     private WebClient validatorClient;
 
     public CPFValidationServiceImpl(WebClient.Builder builder) {
+        WebClient.builder();
         validatorClient = builder
                 .baseUrl("https://user-info.herokuapp.com")
                 .build();
