@@ -1,8 +1,8 @@
 package com.mateusfma.assemblyvoting.service;
 
-import com.mateusfma.assemblyvoting.router.rest.request.AssociateRequest;
-import com.mateusfma.assemblyvoting.router.rest.request.AssociateUpdateRequest;
-import com.mateusfma.assemblyvoting.router.rest.response.AssociateResponse;
+import com.mateusfma.assemblyvoting.controller.rest.request.AssociateRequest;
+import com.mateusfma.assemblyvoting.controller.rest.response.AssociateResponse;
+import com.mateusfma.assemblyvoting.entity.Associate;
 import reactor.core.publisher.Mono;
 
 public interface AssociateService {
@@ -11,9 +11,9 @@ public interface AssociateService {
 
     Mono<AssociateResponse> createAssociate(Mono<AssociateRequest> request);
 
-    Mono<AssociateResponse> retrieveAssociate(Long id);
+    Mono<Associate> retrieveAssociate(Long id);
 
-    Mono<AssociateResponse> updateAssociate(Mono<AssociateUpdateRequest> request);
+    Mono<AssociateResponse> updateAssociate(Mono<Associate> associate);
 
     Mono<AssociateResponse> deleteAssociate(Long id);
 

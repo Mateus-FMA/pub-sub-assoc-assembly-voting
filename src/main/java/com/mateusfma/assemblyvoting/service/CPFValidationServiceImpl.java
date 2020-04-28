@@ -1,7 +1,7 @@
 package com.mateusfma.assemblyvoting.service;
 
-import com.mateusfma.assemblyvoting.router.rest.enums.CPFVoteStatus;
-import com.mateusfma.assemblyvoting.router.rest.response.CPFStatusResponse;
+import com.mateusfma.assemblyvoting.controller.rest.enums.CPFVoteStatus;
+import com.mateusfma.assemblyvoting.controller.rest.response.CPFStatusResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;

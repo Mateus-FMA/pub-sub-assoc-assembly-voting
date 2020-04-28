@@ -1,20 +1,15 @@
 package com.mateusfma.assemblyvoting.components.manager;
 
 import com.mateusfma.assemblyvoting.entity.Topic;
-import com.mateusfma.assemblyvoting.exceptions.IllegalTopicStateException;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PreDestroy;
 import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Component

@@ -26,11 +26,11 @@ public class VoteRepositoryImpl implements VoteRepository {
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rowsUpdated -> client.execute(sql)
-                    .bind(0, vote.getAssociateId())
-                    .bind(1, vote.getTopicId())
-                    .as(Vote.class)
-                    .fetch()
-                    .one());
+                        .bind(0, vote.getAssociateId())
+                        .bind(1, vote.getTopicId())
+                        .as(Vote.class)
+                        .fetch()
+                        .one());
     }
 
     @Override

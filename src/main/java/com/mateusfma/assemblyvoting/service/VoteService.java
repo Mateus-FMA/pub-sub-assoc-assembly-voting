@@ -1,14 +1,13 @@
 package com.mateusfma.assemblyvoting.service;
 
-import com.mateusfma.assemblyvoting.router.rest.request.CountVoteRequest;
-import com.mateusfma.assemblyvoting.router.rest.request.VoteRequest;
-import com.mateusfma.assemblyvoting.router.rest.response.CountVoteResponse;
-import com.mateusfma.assemblyvoting.router.rest.response.VoteResponse;
+import com.mateusfma.assemblyvoting.controller.rest.request.CountVoteRequest;
+import com.mateusfma.assemblyvoting.controller.rest.response.CountVoteResponse;
+import com.mateusfma.assemblyvoting.entity.Vote;
 import reactor.core.publisher.Mono;
 
 public interface VoteService {
 
-    Mono<VoteResponse> receiveVote(Mono<VoteRequest> request);
+    Mono<Vote> receiveVote(Long associateId, Long topicId, String value);
 
     Mono<CountVoteResponse> countVotes(Mono<CountVoteRequest> request);
 

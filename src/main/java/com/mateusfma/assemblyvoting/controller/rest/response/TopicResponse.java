@@ -1,28 +1,13 @@
-package com.mateusfma.assemblyvoting.entity;
+package com.mateusfma.assemblyvoting.controller.rest.response;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import java.util.Date;
 
-import java.time.OffsetDateTime;
+public class TopicResponse {
 
-@Table("topic")
-public class Topic {
-
-    @Id
-    @Column("topic_id")
     private Long id;
-
-    @Column("topic_name")
     private String name;
-
-    @Column("is_opened")
     private Boolean open;
-
-    @Column("start_time")
-    private OffsetDateTime start;
-
-    @Column("duration_sec")
+    private Date start;
     private Integer durationSec;
 
     public Long getId() {
@@ -41,11 +26,11 @@ public class Topic {
         this.name = name;
     }
 
-    public OffsetDateTime getStart() {
+    public Date getStart() {
         return start;
     }
 
-    public void setStart(OffsetDateTime start) {
+    public void setStart(Date start) {
         this.start = start;
     }
 
