@@ -3,12 +3,12 @@ package com.mateusfma.assemblyvoting.controller;
 import com.mateusfma.assemblyvoting.controller.rest.request.AssociateRequest;
 import com.mateusfma.assemblyvoting.controller.rest.request.AssociateUpdateRequest;
 import com.mateusfma.assemblyvoting.controller.rest.response.AssociateResponse;
-import com.mateusfma.assemblyvoting.exceptions.InvalidRequestException;
+import com.mateusfma.assemblyvoting.exceptions.InvalidCPFException;
+import com.mateusfma.assemblyvoting.exceptions.NoSuchAssociateException;
 import com.mateusfma.assemblyvoting.service.AssociateService;
 import com.mateusfma.assemblyvoting.service.CPFValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -23,24 +23,23 @@ public class AssociateController {
     private AssociateService associateService;
 
     @PostMapping(value = "/create")
-    public ResponseEntity<Mono<AssociateResponse>> createAssociate(@RequestBody AssociateRequest request) {
-        Mono<AssociateResponse> response = cpfValidationService.isValid(Mono.just(request.getCpf()))
-                .flatMap(valid -> {
-                    if (!valid)
-                        throw new InvalidRequestException("CPF inválido.");
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<AssociateResponse> createAssociate(@RequestBody AssociateRequest request) {
+        return cpfValidationService.isValid(Mono.just(request.getCpf()))
+                        .flatMap(valid -> {
+                            if (!valid)
+                                throw new InvalidCPFException("CPF inválido.");
 
-                    return associateService.createAssociate(Mono.just(request));
-                });
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                            return associateService.createAssociate(Mono.just(request));
+                        });
     }
 
     @GetMapping(value = "/retrieve/{id}")
-    public ResponseEntity<Mono<AssociateResponse>> retrieveAssociate(@PathVariable Long id) {
-        Mono<AssociateResponse> response = associateService.hasAssociate(id)
+    public Mono<AssociateResponse> retrieveAssociate(@PathVariable Long id) {
+        return associateService.hasAssociate(id)
                 .flatMap(exists -> {
                     if (!exists)
-                        throw new InvalidRequestException("Associado de ID " + id + " não existe.");
+                        throw new NoSuchAssociateException("Associado de ID " + id + " não existe.");
 
                     return associateService
                             .retrieveAssociate(id)
@@ -54,50 +53,50 @@ public class AssociateController {
                                 return associateResponse;
                             });
                 });
-
-        return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Mono<AssociateResponse>> updateAssociate(@RequestBody AssociateUpdateRequest request) {
-        Mono<AssociateResponse> response = Mono.just(request)
-                .flatMap(req -> {
-                    if (req.getCpf() != null)
-                        return cpfValidationService.isValid(Mono.just(req.getCpf()));
-                    else
-                        return Mono.just(true);
-                })
-                .flatMap(valid -> {
-                    if (!valid)
-                        throw new InvalidRequestException("CPF inválido.");
+    public Mono<AssociateResponse> updateAssociate(@RequestBody AssociateUpdateRequest request) {
+        return associateService.hasAssociate(request.getId())
+                    .map(exists -> {
+                        if (!exists)
+                            throw new NoSuchAssociateException("Associado de ID " + request.getId() + " não existe.");
 
-                    return associateService.retrieveAssociate(request.getId());
-                })
-                .flatMap(associate -> {
-                    if (request.getCpf() != null)
-                        associate.setCpf(request.getCpf());
+                        return request;
+                    })
+                    .flatMap(req -> {
+                        if (req.getCpf() != null)
+                            return cpfValidationService.isValid(Mono.just(req.getCpf()));
+                        else
+                            return Mono.just(true);
+                    })
+                    .flatMap(valid -> {
+                        if (!valid)
+                            throw new InvalidCPFException("CPF inválido.");
 
-                    if (request.getName() != null)
-                        associate.setName(request.getName());
+                        return associateService.retrieveAssociate(request.getId());
+                    })
+                    .flatMap(associate -> {
+                        if (request.getCpf() != null)
+                            associate.setCpf(request.getCpf());
 
-                    if (request.getAge() != null)
-                        associate.setAge(request.getAge());
+                        if (request.getName() != null)
+                            associate.setName(request.getName());
 
-                    return associateService.updateAssociate(Mono.just(associate));
-                });
+                        if (request.getAge() != null)
+                            associate.setAge(request.getAge());
 
-        return ResponseEntity.ok().body(response);
+                        return associateService.updateAssociate(Mono.just(associate));
+                    });
     }
 
     @DeleteMapping(value = "/delete/{id}")
-    public ResponseEntity<Mono<AssociateResponse>> deleteAssociate(@PathVariable Long id) {
-        Mono<AssociateResponse> response = associateService.hasAssociate(id)
+    public Mono<AssociateResponse> deleteAssociate(@PathVariable Long id) {
+        return associateService.hasAssociate(id)
                 .flatMap(exists -> {
                     if (!exists)
-                        throw new InvalidRequestException("Associado de ID " + id + " não existe.");
+                        throw new NoSuchAssociateException("Associado de ID " + id + " não existe.");
                     return associateService.deleteAssociate(id);
                 });
-
-        return ResponseEntity.ok().body(response);
     }
 }

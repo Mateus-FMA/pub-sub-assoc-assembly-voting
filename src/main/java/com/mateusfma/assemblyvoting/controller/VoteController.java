@@ -8,7 +8,7 @@ import com.mateusfma.assemblyvoting.entity.Associate;
 import com.mateusfma.assemblyvoting.entity.Topic;
 import com.mateusfma.assemblyvoting.entity.Vote;
 import com.mateusfma.assemblyvoting.exceptions.ClosedTopicException;
-import com.mateusfma.assemblyvoting.exceptions.InvalidRequestException;
+import com.mateusfma.assemblyvoting.exceptions.InvalidCPFException;
 import com.mateusfma.assemblyvoting.exceptions.InvalidVoteException;
 import com.mateusfma.assemblyvoting.service.AssociateService;
 import com.mateusfma.assemblyvoting.service.CPFValidationService;
@@ -39,8 +39,9 @@ public class VoteController {
     private VoteService voteService;
 
     @PostMapping(value = "/receive")
-    public ResponseEntity<Mono<VoteResponse>> receiveVote(@RequestBody VoteRequest request) {
-        Mono<VoteResponse> response = Mono.zip(
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<VoteResponse> receiveVote(@RequestBody VoteRequest request) {
+        return Mono.zip(
                     associateService.retrieveAssociate(request.getAssociateId()),
                     topicService.findByName(Mono.just(request.getTopicName())))
                 .flatMap(tuple -> {
@@ -59,7 +60,7 @@ public class VoteController {
                     Topic topic = tuple.getT3();
 
                     if (!able)
-                        throw new InvalidRequestException("CPF inválido.");
+                        throw new InvalidCPFException("CPF inválido.");
 
                     if (topic.getStart() == null || topic.getDurationSec() == null)
                         throw new ClosedTopicException("Pauta não se encontra aberta para votação.");
@@ -91,10 +92,6 @@ public class VoteController {
 
                     return voteResponse;
                 });
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
     }
 
     @GetMapping(value = "/count/{topicId}")

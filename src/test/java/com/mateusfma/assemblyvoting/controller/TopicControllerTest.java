@@ -5,9 +5,7 @@ import com.mateusfma.assemblyvoting.controller.rest.request.CreateTopicRequest;
 import com.mateusfma.assemblyvoting.controller.rest.request.OpenVoteSessionRequest;
 import com.mateusfma.assemblyvoting.controller.rest.response.TopicResponse;
 import com.mateusfma.assemblyvoting.entity.Topic;
-import com.mateusfma.assemblyvoting.repository.TopicRepository;
 import com.mateusfma.assemblyvoting.service.TopicService;
-import com.mateusfma.assemblyvoting.service.TopicServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -15,7 +13,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -124,7 +121,7 @@ class TopicControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isBadRequest();
 
         Mockito.verify(service, Mockito.times(1)).findByName(ArgumentMatchers.any());
         Mockito.verifyNoMoreInteractions(service);

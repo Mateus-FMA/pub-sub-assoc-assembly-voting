@@ -27,7 +27,7 @@ import java.time.OffsetDateTime;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = VoteController.class)
-public class VoteControllerTest {
+class VoteControllerTest {
 
     @Autowired
     private WebTestClient client;
@@ -111,6 +111,144 @@ public class VoteControllerTest {
                         ArgumentMatchers.eq("Sim")
                 );
         Mockito.verifyNoMoreInteractions(voteService);
+    }
+
+    @Test
+    void testInvalidCPFReceiveVote() {
+        Associate associate = new Associate();
+        associate.setId(1L);
+        associate.setCpf("71781866074");
+        associate.setName("Edward Elric");
+        associate.setAge(17);
+
+        Topic topic = new Topic();
+        topic.setId(1L);
+        topic.setName("Tópico");
+        topic.setOpen(true);
+        topic.setStart(OffsetDateTime.now());
+        topic.setDurationSec(120);
+
+        Mockito.when(associateService.retrieveAssociate(ArgumentMatchers.eq(1L))).thenReturn(Mono.just(associate));
+        Mockito.when(topicService.findByName(ArgumentMatchers.any())).thenReturn(Mono.just(topic));
+        Mockito.when(cpfValidationService.isAbleToVote(ArgumentMatchers.any())).thenReturn(Mono.just(false));
+
+        VoteRequest request = new VoteRequest();
+        request.setAssociateId(1L);
+        request.setTopicName("Tópico");
+        request.setVote("Sim");
+
+        client.post()
+                .uri("/vote/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isBadRequest();
+
+        Mockito.verify(associateService, Mockito.times(1))
+                .retrieveAssociate(ArgumentMatchers.eq(1L));
+        Mockito.verifyNoMoreInteractions(associateService);
+
+        Mockito.verify(topicService, Mockito.times(1))
+                .findByName(ArgumentMatchers.any());
+        Mockito.verifyNoMoreInteractions(topicService);
+
+        Mockito.verify(cpfValidationService, Mockito.times(1))
+                .isAbleToVote(ArgumentMatchers.any());
+        Mockito.verifyNoMoreInteractions(cpfValidationService);
+
+        Mockito.verifyNoInteractions(voteService);
+    }
+
+    @Test
+    void testClosedTopic() {
+        Associate associate = new Associate();
+        associate.setId(1L);
+        associate.setCpf("71781866074");
+        associate.setName("Edward Elric");
+        associate.setAge(17);
+
+        Topic topic = new Topic();
+        topic.setId(1L);
+        topic.setName("Tópico");
+        topic.setOpen(false);
+        topic.setStart(OffsetDateTime.now());
+        topic.setDurationSec(120);
+
+        Mockito.when(associateService.retrieveAssociate(ArgumentMatchers.eq(1L))).thenReturn(Mono.just(associate));
+        Mockito.when(topicService.findByName(ArgumentMatchers.any())).thenReturn(Mono.just(topic));
+        Mockito.when(cpfValidationService.isAbleToVote(ArgumentMatchers.any())).thenReturn(Mono.just(true));
+
+        VoteRequest request = new VoteRequest();
+        request.setAssociateId(1L);
+        request.setTopicName("Tópico");
+        request.setVote("Sim");
+
+        client.post()
+                .uri("/vote/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isBadRequest();
+
+        Mockito.verify(associateService, Mockito.times(1))
+                .retrieveAssociate(ArgumentMatchers.eq(1L));
+        Mockito.verifyNoMoreInteractions(associateService);
+
+        Mockito.verify(topicService, Mockito.times(1))
+                .findByName(ArgumentMatchers.any());
+        Mockito.verifyNoMoreInteractions(topicService);
+
+        Mockito.verify(cpfValidationService, Mockito.times(1))
+                .isAbleToVote(ArgumentMatchers.any());
+        Mockito.verifyNoMoreInteractions(cpfValidationService);
+
+        Mockito.verifyNoInteractions(voteService);
+    }
+
+    @Test
+    void testInvalidVoteValue() {
+        Associate associate = new Associate();
+        associate.setId(1L);
+        associate.setCpf("71781866074");
+        associate.setName("Edward Elric");
+        associate.setAge(17);
+
+        Topic topic = new Topic();
+        topic.setId(1L);
+        topic.setName("Tópico");
+        topic.setOpen(true);
+        topic.setStart(OffsetDateTime.now());
+        topic.setDurationSec(120);
+
+        Mockito.when(associateService.retrieveAssociate(ArgumentMatchers.eq(1L))).thenReturn(Mono.just(associate));
+        Mockito.when(topicService.findByName(ArgumentMatchers.any())).thenReturn(Mono.just(topic));
+        Mockito.when(cpfValidationService.isAbleToVote(ArgumentMatchers.any())).thenReturn(Mono.just(true));
+
+        VoteRequest request = new VoteRequest();
+        request.setAssociateId(1L);
+        request.setTopicName("Tópico");
+        request.setVote("asdfasdfasdf");
+
+        client.post()
+                .uri("/vote/receive")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isBadRequest();
+
+        Mockito.verify(associateService, Mockito.times(1))
+                .retrieveAssociate(ArgumentMatchers.eq(1L));
+        Mockito.verifyNoMoreInteractions(associateService);
+
+        Mockito.verify(topicService, Mockito.times(1))
+                .findByName(ArgumentMatchers.any());
+        Mockito.verifyNoMoreInteractions(topicService);
+
+        Mockito.verify(cpfValidationService, Mockito.times(1))
+                .isAbleToVote(ArgumentMatchers.any());
+        Mockito.verifyNoMoreInteractions(cpfValidationService);
+
+        Mockito.verifyNoInteractions(voteService);
     }
 
     @Test

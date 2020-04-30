@@ -15,22 +15,6 @@ public class Associate {
 
     private String cpf;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Associate associate = (Associate) o;
-        return id.equals(associate.id) &&
-                cpf.equals(associate.cpf) &&
-                name.equals(associate.name) &&
-                age.equals(associate.age);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, cpf, name, age);
-    }
-
     @Column("associate_name")
     private String name;
 

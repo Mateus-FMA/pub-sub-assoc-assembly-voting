@@ -3,7 +3,6 @@ package com.mateusfma.assemblyvoting.service;
 import com.mateusfma.assemblyvoting.controller.rest.enums.VoteValue;
 import com.mateusfma.assemblyvoting.controller.rest.response.CountVoteResponse;
 import com.mateusfma.assemblyvoting.entity.Vote;
-import com.mateusfma.assemblyvoting.repository.AssociateRepository;
 import com.mateusfma.assemblyvoting.repository.TopicRepository;
 import com.mateusfma.assemblyvoting.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +11,6 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class VoteServiceImpl implements VoteService {
-
-    @Autowired
-    private AssociateRepository associateRepository;
-
-    @Autowired
-    private TopicRepository topicRepository;
 
     @Autowired
     private VoteRepository voteRepository;
@@ -34,10 +27,10 @@ public class VoteServiceImpl implements VoteService {
 
     @Override
     public Mono<CountVoteResponse> countVotes(Long topicId) {
-        return topicRepository.findById(topicId)
-                .flatMap(topic -> Mono.zip(
-                        voteRepository.countVotes(topic.getId(), VoteValue.YES.getValue()),
-                        voteRepository.countVotes(topic.getId(), VoteValue.NO.getValue())))
+        return Mono.zip(
+                    voteRepository.countVotes(topicId, VoteValue.YES.getValue()),
+                    voteRepository.countVotes(topicId, VoteValue.NO.getValue())
+                )
                 .map(objs -> {
                     CountVoteResponse response = new CountVoteResponse();
                     response.setYes(objs.getT1());

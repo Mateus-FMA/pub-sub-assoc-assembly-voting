@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ClosedTopicException extends RuntimeException {
+public class InvalidCPFException extends RuntimeException {
 
-    public ClosedTopicException(String message) {
+    public InvalidCPFException(String message) {
         super(message);
     }
 }

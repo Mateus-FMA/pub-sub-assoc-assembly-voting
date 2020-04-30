@@ -8,10 +8,7 @@ import com.mateusfma.assemblyvoting.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.time.OffsetDateTime;
@@ -24,15 +21,14 @@ public class TopicController {
     private TopicService service;
 
     @PostMapping(value = "/create")
-    public ResponseEntity<Mono<TopicResponse>> createTopic(@RequestBody CreateTopicRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(service.createTopic(Mono.just(request)));
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<TopicResponse> createTopic(@RequestBody CreateTopicRequest request) {
+        return service.createTopic(Mono.just(request));
     }
 
     @PostMapping(value = "/open")
-    public ResponseEntity<Mono<TopicResponse>> openVoteSession(@RequestBody OpenVoteSessionRequest request) {
-        Mono<TopicResponse> response = service.findByName(Mono.just(request.getTopicName()))
+    public Mono<TopicResponse> openVoteSession(@RequestBody OpenVoteSessionRequest request) {
+        return service.findByName(Mono.just(request.getTopicName()))
                 .flatMap(topic -> {
                     if (topic.getStart() != null)
                         throw new IllegalTopicStateException("Pauta já foi iniciada em " +
@@ -45,8 +41,6 @@ public class TopicController {
 
                     return service.openVoteSession(Mono.just(topic));
                 });
-
-        return ResponseEntity.ok(response);
     }
 
 }
